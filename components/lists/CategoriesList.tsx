@@ -15,6 +15,7 @@ import { BASE_URL } from "@/constants";
 import { CategoryResponseDto } from "@/dto/category.dto";
 import { RootState, deleteCategory, fetchCategories } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { Edit, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -124,7 +125,7 @@ export default function CategoriesList() {
                       />
                     </span>
                   </ItemDescription>
-                  <ItemActions className="w-full">
+                  <ItemActions className="w-full flex-col gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -133,6 +134,26 @@ export default function CategoriesList() {
                     >
                       Виж
                     </Button>
+                    {isAdmin && (
+                      <div className="flex gap-2 w-full">
+                        <Button
+                          variant="warning"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => handleEditCategory(category.id)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => handleRemoveCategory(category.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
                   </ItemActions>
                 </Item>
               ))}
