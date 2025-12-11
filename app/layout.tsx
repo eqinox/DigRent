@@ -1,3 +1,7 @@
+import { AuthInitializer } from "@/components/providers/AuthInitializer";
+import { StoreProvider } from "@/components/providers/StoreProvider";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -23,11 +27,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <StoreProvider>
+          <AuthInitializer>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <div className="relative flex min-h-screen flex-col max-w-7xl mx-auto ">
+                {/* <div className="absolute right-4 top-4 z-50"> */}
+                {/* <ThemeToggle /> */}
+                {/* </div> */}
+                {children}
+              </div>
+              <Toaster />
+            </ThemeProvider>
+          </AuthInitializer>
+        </StoreProvider>
       </body>
     </html>
   );
