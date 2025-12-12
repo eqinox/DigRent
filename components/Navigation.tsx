@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,15 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { RootState, logout, fetchCategories } from "@/store";
+import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
+import { RootState, fetchCategories, logout } from "@/store";
 import { useAppDispatch } from "@/store/hooks";
 import { House, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import AddEquipmentDialog from "@/components/dialogs/AddEquipmentDialog";
 import {
   MenubarContent,
   MenubarItem,
@@ -33,6 +33,7 @@ const Navigation = () => {
   );
   const [isSubCategoryDialogOpen, setIsSubCategoryDialogOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false);
 
   useEffect(() => {
     if (isSubCategoryDialogOpen && categories.length === 0) {
@@ -75,6 +76,16 @@ const Navigation = () => {
           </MenubarTrigger>
         </MenubarMenu>
         <MenubarMenu>
+          <MenubarTrigger onClick={() => setIsEquipmentDialogOpen(true)}>
+            <div className="flex flex-col items-center">
+              <span>
+                <Plus />
+              </span>
+              <span>New</span>
+            </div>
+          </MenubarTrigger>
+        </MenubarMenu>
+        <MenubarMenu>
           <MenubarTrigger>
             <Avatar>
               <AvatarImage src="https://github.com/shadcn.png" />
@@ -105,7 +116,10 @@ const Navigation = () => {
         </MenubarMenu>
       </Menubar>
 
-      <Dialog open={isSubCategoryDialogOpen} onOpenChange={setIsSubCategoryDialogOpen}>
+      <Dialog
+        open={isSubCategoryDialogOpen}
+        onOpenChange={setIsSubCategoryDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Избери категория</DialogTitle>
@@ -141,12 +155,20 @@ const Navigation = () => {
             >
               Отказ
             </Button>
-            <Button onClick={handleAddSubCategory} disabled={!selectedCategoryId}>
+            <Button
+              onClick={handleAddSubCategory}
+              disabled={!selectedCategoryId}
+            >
               Продължи
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AddEquipmentDialog
+        open={isEquipmentDialogOpen}
+        onOpenChange={setIsEquipmentDialogOpen}
+      />
     </nav>
   );
 };

@@ -3,30 +3,30 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-import SubCategoryForm from "@/components/forms/SubCategoryForm";
+import EquipmentForm from "@/components/forms/EquipmentForm";
 
-export default function AddSubCategoryPage() {
+export default function AddEquipmentPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const categoryId = searchParams.get("categoryId");
+  const subCategoryId = searchParams.get("subCategoryId");
 
   useEffect(() => {
-    if (!categoryId) {
+    if (!subCategoryId) {
       router.push("/categories");
     }
-  }, [categoryId, router]);
+  }, [subCategoryId, router]);
 
-  const handleSuccess = ({ type }: { type: string; mode: "create" }) => {
+  const handleSuccess = ({ name }: { name: string; mode: "create" }) => {
     router.push(
-      `/sub-category/success?mode=create&type=${encodeURIComponent(type)}`
+      `/equipment/success?mode=create&name=${encodeURIComponent(name)}`
     );
   };
 
-  if (!categoryId) {
+  if (!subCategoryId) {
     return (
       <div className="container mx-auto p-4 pb-20">
         <p className="text-center text-muted-foreground">
-          Липсва ID на категорията. Моля, изберете категория отново.
+          Липсва ID на подкатегорията. Моля, изберете подкатегория отново.
         </p>
       </div>
     );
@@ -34,15 +34,11 @@ export default function AddSubCategoryPage() {
 
   return (
     <div className="container mx-auto p-4 pb-20">
-      <SubCategoryForm
+      <EquipmentForm
         mode="create"
-        categoryId={categoryId}
+        subCategoryId={subCategoryId}
         onSuccessRedirect={handleSuccess}
       />
     </div>
   );
 }
-
-
-
-

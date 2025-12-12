@@ -9,6 +9,3 @@ export default function EquipmentsPage({
   const { id } = use(params);
   return <EquipmentsList subCategoryId={id} />;
 }
-
-
-

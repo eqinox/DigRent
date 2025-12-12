@@ -5,23 +5,23 @@ import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 
-export default function SubCategorySuccessPage() {
+export default function EquipmentSuccessPage() {
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") === "edit" ? "edit" : "create";
-  const type = searchParams.get("type");
+  const name = searchParams.get("name");
 
   return (
     <div className="container mx-auto flex min-h-[60vh] flex-col items-center justify-center gap-4 p-4 pb-20 text-center">
       <h1 className="text-2xl font-bold">
         {mode === "edit"
-          ? "Подкатегорията е обновена успешно"
-          : "Подкатегорията е създадена успешно"}
+          ? "Оборудването е обновено успешно"
+          : "Оборудването е създадено успешно"}
       </h1>
-      {type && (
+      {name && (
         <p className="text-muted-foreground">
           {mode === "edit"
-            ? `Обновихте подкатегорията "${type}".`
-            : `Добавихте нова подкатегория "${type}".`}
+            ? `Обновихте оборудването "${name}".`
+            : `Добавихте ново оборудване "${name}".`}
         </p>
       )}
 
@@ -36,7 +36,3 @@ export default function SubCategorySuccessPage() {
     </div>
   );
 }
-
-
-
-

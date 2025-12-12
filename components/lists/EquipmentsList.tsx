@@ -21,9 +21,13 @@ import {
 } from "@/components/ui/card";
 import { BASE_URL } from "@/constants";
 import { EquipmentResponseDto } from "@/dto/equipment.dto";
-import { RootState, deleteEquipment, fetchEquipmentsBySubCategoryId } from "@/store";
+import {
+  RootState,
+  deleteEquipment,
+  fetchEquipmentsBySubCategoryId,
+} from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -33,9 +37,7 @@ interface EquipmentsListProps {
   subCategoryId: string;
 }
 
-export default function EquipmentsList({
-  subCategoryId,
-}: EquipmentsListProps) {
+export default function EquipmentsList({ subCategoryId }: EquipmentsListProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const equipments = useAppSelector(
@@ -58,6 +60,11 @@ export default function EquipmentsList({
 
   const handleEquipmentPress = (equipmentId: string) => {
     router.push(`/equipment/${equipmentId}`);
+  };
+
+  const handleEditEquipment = (e: React.MouseEvent, equipmentId: string) => {
+    e.stopPropagation();
+    router.push(`/equipment/edit/${equipmentId}`);
   };
 
   const handleRemoveEquipment = (e: React.MouseEvent, equipmentId: string) => {
@@ -91,7 +98,7 @@ export default function EquipmentsList({
   };
 
   const isAdmin = user?.role === "admin";
-
+  console.log("isAdmin", isAdmin);
   return (
     <>
       <div className="container mx-auto p-4 pb-20">
@@ -136,21 +143,37 @@ export default function EquipmentsList({
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0 pb-2">
-                      <p className="text-base">{equipment.pricePerDay} лв/ден</p>
+                      <p className="text-base">
+                        {equipment.pricePerDay} лв/ден
+                      </p>
                       <CardDescription className="pt-2 text-sm">
                         {equipment.description}
                       </CardDescription>
                     </CardContent>
                     {isAdmin && (
                       <CardFooter className="p-0 pt-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => handleRemoveEquipment(e, equipment.id)}
-                          className="bg-red-500 p-2 text-white hover:bg-red-600"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="warning"
+                            size="sm"
+                            onClick={(e) =>
+                              handleEditEquipment(e, equipment.id)
+                            }
+                            className="flex-1"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) =>
+                              handleRemoveEquipment(e, equipment.id)
+                            }
+                            className="flex-1"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </CardFooter>
                     )}
                   </div>
@@ -187,6 +210,3 @@ export default function EquipmentsList({
     </>
   );
 }
-
-
-
