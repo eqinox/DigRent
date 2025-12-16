@@ -23,7 +23,10 @@ const fetchSubCategories = createAsyncThunk(
     )) as { data: SubCategoryResponseDto[] } | { error: FetchBaseQueryError };
 
     if ("data" in result) {
-      return result.data;
+      return {
+        subCategories: result.data,
+        categoryId: categoryId,
+      };
     } else if ("error" in result) {
       const errorMessage = handleFetchBaseQueryError(result.error);
       throw new Error(errorMessage);

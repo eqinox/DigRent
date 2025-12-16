@@ -29,6 +29,7 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CategoriesList() {
   const router = useRouter();
@@ -100,8 +101,25 @@ export default function CategoriesList() {
         </div>
 
         {isLoading && categories.length === 0 ? (
-          <div className="flex items-center justify-center py-12">
-            <div>Зареждане...</div>
+          <div className="flex w-full gap-6">
+            <ItemGroup className="flex flex-row flex-wrap justify-center gap-4">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Item key={index} variant="outline" className="w-48">
+                  <ItemContent>
+                    <ItemTitle>
+                      <Skeleton className="h-5 w-32" />
+                    </ItemTitle>
+                  </ItemContent>
+                  <ItemDescription>
+                    <Skeleton className="h-32 w-full" />
+                  </ItemDescription>
+                  <ItemActions className="w-full flex-col gap-2">
+                    <Skeleton className="h-9 w-full" />
+                    <Skeleton className="h-9 w-full" />
+                  </ItemActions>
+                </Item>
+              ))}
+            </ItemGroup>
           </div>
         ) : categories.length === 0 ? (
           <div className="flex items-center justify-center py-12">

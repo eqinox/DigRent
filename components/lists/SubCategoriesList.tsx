@@ -39,12 +39,26 @@ export default function SubCategoriesList({
 }: SubCategoriesListProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const subCategories = useAppSelector(
-    (state: RootState) => state.subCategories.subCategories
+  const subCategoriesByCategory = useAppSelector(
+    (state: RootState) => state.subCategories.subCategoriesByCategory
   );
+  const subCategories = subCategoriesByCategory[categoryId] || [];
   const isLoading = useAppSelector(
     (state: RootState) => state.subCategories.isLoading
   );
+  const loadingCategoryId = useAppSelector(
+    (state: RootState) => state.subCategories.loadingCategoryId
+  );
+  const isCurrentCategoryLoading =
+    isLoading && loadingCategoryId === categoryId;
+  const deletingSubCategoryId = useAppSelector(
+    (state: RootState) => state.subCategories.deletingSubCategoryId
+  );
+  const hasFetchedSubCategoriesByCategory = useAppSelector(
+    (state: RootState) => state.subCategories.hasFetchedSubCategoriesByCategory
+  );
+  const hasFetchedSubCategories =
+    hasFetchedSubCategoriesByCategory[categoryId] || false;
   const user = useAppSelector((state: RootState) => state.auth.user);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [subCategoryToDelete, setSubCategoryToDelete] = useState<string | null>(
@@ -52,10 +66,10 @@ export default function SubCategoriesList({
   );
 
   useEffect(() => {
-    if (categoryId) {
+    if (categoryId && !hasFetchedSubCategories) {
       dispatch(fetchSubCategories(categoryId));
     }
-  }, [dispatch, categoryId]);
+  }, [dispatch, categoryId, hasFetchedSubCategories]);
 
   const handleSubCategoryPress = (subCategoryId: string) => {
     router.push(`/equipments/${subCategoryId}`);
@@ -79,8 +93,6 @@ export default function SubCategoriesList({
         onSuccess: (message: string) => {
           toast.success(message);
           cancelDeleteSubCategory();
-          // Refresh sub-categories after deletion
-          dispatch(fetchSubCategories(categoryId));
         },
         onError: (message: string) => {
           toast.error(message);
@@ -102,7 +114,7 @@ export default function SubCategoriesList({
         <h1 className="text-2xl font-bold text-center">Подкатегории</h1>
       </div>
 
-      {isLoading ? (
+      {isCurrentCategoryLoading && subCategories.length === 0 ? (
         <div className="flex items-center justify-center py-12">
           <div>Зареждане...</div>
         </div>
@@ -113,74 +125,91 @@ export default function SubCategoriesList({
       ) : (
         <div className="flex w-full max-w-xl flex-col gap-6">
           <ItemGroup className="grid grid-cols-3 gap-4">
-            {subCategories.map((subCategory: SubCategoryResponseDto) => (
-              <Item
-                key={subCategory.id}
-                variant="outline"
-                className="cursor-pointer"
-              >
-                <ItemContent>
-                  <ItemTitle>{subCategory.type}</ItemTitle>
-                </ItemContent>
-                <ItemDescription
-                  className="cursor-pointer"
-                  onClick={() => handleSubCategoryPress(subCategory.id)}
+            {subCategories.map((subCategory: SubCategoryResponseDto) => {
+              const isDeleting = deletingSubCategoryId === subCategory.id;
+              return (
+                <Item
+                  key={subCategory.id}
+                  variant="outline"
+                  className={`cursor-pointer relative ${
+                    isDeleting ? "opacity-50 pointer-events-none" : ""
+                  }`}
                 >
-                  {subCategory.image ? (
-                    <span className="relative h-30 w-full overflow-hidden block">
-                      <Image
-                        src={`${BASE_URL}/${subCategory.image.small}`}
-                        alt={subCategory.type}
-                        width={192}
-                        height={192}
-                        loading="eager"
-                        unoptimized={true}
-                        className="h-full w-full object-fill"
-                      />
-                    </span>
-                  ) : (
-                    <div className="flex h-48 w-full items-center justify-center bg-muted">
-                      <span className="text-muted-foreground">
-                        Няма изображение
-                      </span>
+                  {isDeleting && (
+                    <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 rounded-md">
+                      <div className="text-sm">Изтриване...</div>
                     </div>
                   )}
-                </ItemDescription>
-                <div className="text-center text-xs text-muted-foreground">
-                  {subCategory.minRange} - {subCategory.maxRange}
-                </div>
-                <ItemActions className="w-full flex-col gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => handleSubCategoryPress(subCategory.id)}
+                  <ItemContent>
+                    <ItemTitle>{subCategory.type}</ItemTitle>
+                  </ItemContent>
+                  <ItemDescription
+                    className={isDeleting ? "" : "cursor-pointer"}
+                    onClick={() =>
+                      !isDeleting && handleSubCategoryPress(subCategory.id)
+                    }
                   >
-                    Виж
-                  </Button>
-                  {isAdmin && (
-                    <div className="flex gap-2 w-full">
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => handleEditSubCategory(subCategory.id)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => handleRemoveSubCategory(subCategory.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </ItemActions>
-              </Item>
-            ))}
+                    {subCategory.image ? (
+                      <span className="relative h-30 w-full overflow-hidden block">
+                        <Image
+                          src={`${BASE_URL}/${subCategory.image.small}`}
+                          alt={subCategory.type}
+                          width={192}
+                          height={192}
+                          loading="eager"
+                          unoptimized={true}
+                          className="h-full w-full object-fill"
+                        />
+                      </span>
+                    ) : (
+                      <div className="flex h-48 w-full items-center justify-center bg-muted">
+                        <span className="text-muted-foreground">
+                          Няма изображение
+                        </span>
+                      </div>
+                    )}
+                  </ItemDescription>
+                  <div className="text-center text-xs text-muted-foreground">
+                    {subCategory.minRange} - {subCategory.maxRange}
+                  </div>
+                  <ItemActions className="w-full flex-col gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => handleSubCategoryPress(subCategory.id)}
+                      disabled={isDeleting}
+                    >
+                      Виж
+                    </Button>
+                    {isAdmin && (
+                      <div className="flex gap-2 w-full">
+                        <Button
+                          variant="warning"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => handleEditSubCategory(subCategory.id)}
+                          disabled={isDeleting}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() =>
+                            handleRemoveSubCategory(subCategory.id)
+                          }
+                          disabled={isDeleting}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </ItemActions>
+                </Item>
+              );
+            })}
           </ItemGroup>
         </div>
       )}

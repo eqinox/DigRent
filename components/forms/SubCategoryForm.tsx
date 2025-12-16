@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { BASE_URL } from "@/constants";
+import { FormMode } from "@/dto/common.dto";
 import { RootState } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -30,8 +31,6 @@ import {
   type SubCategoryCreateData,
   type SubCategoryUpdateData,
 } from "@/validation/subCategory";
-
-type FormMode = "create" | "edit";
 
 type SubCategoryFormProps = {
   mode?: FormMode;
@@ -193,7 +192,8 @@ export default function SubCategoryForm({
         }
 
         const payload: SubCategoryCreateData = {
-          categoryId: categoryId || (values as SubCategoryCreateData).categoryId,
+          categoryId:
+            categoryId || (values as SubCategoryCreateData).categoryId,
           type: values.type,
           minRange: values.minRange,
           maxRange: values.maxRange,
@@ -355,4 +355,3 @@ export default function SubCategoryForm({
     </div>
   );
 }
-
