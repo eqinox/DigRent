@@ -18,8 +18,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { BASE_URL } from "@/constants";
+import { FormMode } from "@/dto/common.dto";
 import { RootState } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { resetSelectedCategory } from "@/store/slices/categoriesSlice";
 import { createCategory, editCategory } from "@/store/thunks/fetchCategories";
 import {
   categoryCreateSchema,
@@ -27,8 +29,6 @@ import {
   type CategoryCreateData,
   type CategoryUpdateData,
 } from "@/validation/category";
-
-type FormMode = "create" | "edit";
 
 type CategoryFormProps = {
   mode?: FormMode;
@@ -79,6 +79,12 @@ export default function CategoryForm({
   });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetSelectedCategory());
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     if (initialData) {

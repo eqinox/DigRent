@@ -14,6 +14,8 @@ export interface CategoriesState {
   error: string | null;
   selectedCategory: CategoryResponseDto | null;
   message: string;
+  deletingCategoryId: string | null;
+  hasFetchedCategories: boolean;
 }
 
 const initialState: CategoriesState = {
@@ -22,12 +24,18 @@ const initialState: CategoriesState = {
   error: null,
   selectedCategory: null,
   message: "",
+  deletingCategoryId: null,
+  hasFetchedCategories: false,
 };
 
 export const categoriesSlice = createSlice({
   name: "categories",
   initialState,
-  reducers: {},
+  reducers: {
+    resetSelectedCategory: (state) => {
+      state.selectedCategory = null;
+    },
+  },
   extraReducers(builder) {
     // Fetch categories
     builder.addCase(fetchCategories.pending, (state, action) => {
@@ -40,6 +48,7 @@ export const categoriesSlice = createSlice({
       state.isLoading = false;
       state.categories = action.payload as CategoryResponseDto[];
       state.error = null;
+      state.hasFetchedCategories = true;
     });
     builder.addCase(fetchCategories.rejected, (state, action) => {
       state.isLoading = false;
@@ -50,7 +59,6 @@ export const categoriesSlice = createSlice({
     // Create category
     builder.addCase(createCategory.pending, (state, action) => {
       state.isLoading = true;
-      state.categories = [];
       state.error = null;
       state.message = "";
     });
@@ -68,7 +76,6 @@ export const categoriesSlice = createSlice({
     // Edit category
     builder.addCase(editCategory.pending, (state, action) => {
       state.isLoading = true;
-      state.categories = [];
       state.error = null;
       state.message = "";
     });
@@ -89,19 +96,19 @@ export const categoriesSlice = createSlice({
 
     // Delete category
     builder.addCase(deleteCategory.pending, (state, action) => {
-      state.isLoading = true;
+      state.deletingCategoryId = action.meta.arg.categoryId;
       state.error = null;
       state.message = "";
     });
     builder.addCase(deleteCategory.fulfilled, (state, action) => {
-      state.isLoading = false;
+      state.deletingCategoryId = null;
       state.categories = state.categories.filter(
         (category) => category.id !== action.payload
       );
       state.error = null;
     });
     builder.addCase(deleteCategory.rejected, (state, action) => {
-      state.isLoading = false;
+      state.deletingCategoryId = null;
       state.error = action.error.message || "Failed to delete category";
       state.message = "";
     });
@@ -126,3 +133,4 @@ export const categoriesSlice = createSlice({
 });
 
 export const categoriesReducer = categoriesSlice.reducer;
+export const { resetSelectedCategory } = categoriesSlice.actions;

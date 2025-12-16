@@ -13,11 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { BASE_URL } from "@/constants";
 import { SubCategoryResponseDto } from "@/dto/subCategory.dto";
-import {
-  RootState,
-  deleteSubCategory,
-  fetchSubCategories,
-} from "@/store";
+import { RootState, deleteSubCategory, fetchSubCategories } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Edit, Trash2 } from "lucide-react";
 import Image from "next/image";

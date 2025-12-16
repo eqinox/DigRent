@@ -19,10 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RootState } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import {
-  createEquipment,
-  updateEquipment,
-} from "@/store/thunks/fetchEquipments";
+import { createEquipment } from "@/store/thunks/fetchEquipments";
 import {
   equipmentSchema,
   type EquipmentFormData,
@@ -195,40 +192,18 @@ export default function EquipmentForm({
         images: base64Images,
       };
 
-      if (isEditMode) {
-        const equipmentIdToUpdate = equipmentId || (initialData as any)?.id;
-        if (!equipmentIdToUpdate) {
-          toast.error("Липсва ID на оборудването");
-          return;
-        }
-
-        dispatch(
-          updateEquipment({
-            equipmentId: equipmentIdToUpdate,
-            data: payload,
-            onSuccess: (message: string) => {
-              toast.success(message);
-              onSuccessRedirect?.({ name: payload.name, mode: "edit" });
-            },
-            onError: (message: string) => {
-              toast.error(message);
-            },
-          })
-        );
-      } else {
-        dispatch(
-          createEquipment({
-            data: payload,
-            onSuccess: (message: string) => {
-              toast.success(message);
-              onSuccessRedirect?.({ name: payload.name, mode: "create" });
-            },
-            onError: (message: string) => {
-              toast.error(message);
-            },
-          })
-        );
-      }
+      dispatch(
+        createEquipment({
+          data: payload,
+          onSuccess: (message: string) => {
+            toast.success(message);
+            onSuccessRedirect?.({ name: payload.name, mode: "create" });
+          },
+          onError: (message: string) => {
+            toast.error(message);
+          },
+        })
+      );
     } catch (error) {
       toast.error("Възникна грешка при обработка на изображенията");
       console.error(error);

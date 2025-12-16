@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { use, useEffect } from "react";
 
 import CategoryForm from "@/components/forms/CategoryForm";
+import { FormMode } from "@/dto/common.dto";
 import { RootState, findCategoryById } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
@@ -21,27 +22,23 @@ export default function EditCategoryPage({
   const isLoading = useAppSelector(
     (state: RootState) => state.categories.isLoading
   );
-  console.log("id", id);
+
   useEffect(() => {
     if (id) {
       dispatch(findCategoryById(id));
     }
   }, [dispatch, id]);
 
-  const handleSuccess = ({
-    name,
-    mode,
-  }: {
-    name: string;
-    mode: "create" | "edit";
-  }) => {
+  const handleSuccess = (params: { name: string; mode: FormMode }) => {
     router.push(
-      `/category/success?mode=${mode}&name=${encodeURIComponent(name)}`
+      `/category/success?mode=${params.mode}&name=${encodeURIComponent(
+        params.name
+      )}`
     );
   };
 
   return (
-    <div className="container mx-auto p-4 pb-20">
+    <div className="mx-auto p-4 pb-20">
       <CategoryForm
         mode="edit"
         categoryId={id}
