@@ -1,4 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Excavator System Management
+
+A comprehensive equipment management system for tracking and organizing excavators and related equipment. This application provides a structured way to manage equipment inventory through categories and subcategories, with full CRUD operations and user authentication.
+
+## Features
+
+- **Equipment Management**: Create, read, update, and delete equipment records with detailed information
+- **Category Organization**: Organize equipment into categories and subcategories for better inventory management
+- **User Authentication**: Secure login system with role-based access control (admin/user roles)
+- **Responsive UI**: Modern, mobile-friendly interface built with Tailwind CSS
+- **Real-time Updates**: Optimistic UI updates with Redux state management
+- **Image Management**: Upload and manage equipment and category images
+
+## Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org) 16.0.7 (App Router)
+- **UI Library**: React 19.2.0
+- **State Management**: Redux Toolkit 2.11.1
+- **Styling**: Tailwind CSS 4
+- **Forms**: React Hook Form with Zod validation
+- **UI Components**: Radix UI primitives
+- **Language**: TypeScript
+- **Notifications**: Sonner
 
 ## Getting Started
 
