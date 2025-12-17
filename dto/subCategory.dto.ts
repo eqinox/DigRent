@@ -1,13 +1,13 @@
+import { CategoryResponseDto } from "./category.dto";
+import { ImageDto } from "./common.dto";
+
 export interface SubCategoryResponseDto {
   id: string;
-  categoryId: string;
+  category: CategoryResponseDto;
   type: string;
   minRange: number;
   maxRange: number;
-  image?: {
-    original: string;
-    small: string;
-  };
+  image?: ImageDto;
   creatorId: string;
   createdAt: Date;
   updatedAt: Date;

@@ -15,7 +15,6 @@ import CallbackHandlers from "./callback-type";
 const fetchSubCategories = createAsyncThunk(
   "subCategories/fetch",
   async (categoryId: string, { dispatch }) => {
-    console.log("fetching sub categories");
     const result = (await dispatch(
       apiSlice.endpoints.authenticatedGet.initiate(
         `/categories/${categoryId}/sub-categories`

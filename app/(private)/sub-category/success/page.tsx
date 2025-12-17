@@ -9,6 +9,7 @@ export default function SubCategorySuccessPage() {
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") === "edit" ? "edit" : "create";
   const type = searchParams.get("type");
+  const categoryId = searchParams.get("categoryId");
 
   return (
     <div className="container mx-auto flex min-h-[60vh] flex-col items-center justify-center gap-4 p-4 pb-20 text-center">
@@ -25,17 +26,15 @@ export default function SubCategorySuccessPage() {
         </p>
       )}
 
-      <div className="flex gap-2">
+      {categoryId && (
         <Button asChild>
-          <Link href="/categories">Към категориите</Link>
+          <Link href={`/sub-category/${categoryId}`}>Към под категорията</Link>
         </Button>
-        <Button asChild variant="outline">
-          <Link href="/categories">Назад</Link>
-        </Button>
-      </div>
+      )}
     </div>
   );
 }
+
 
 
 

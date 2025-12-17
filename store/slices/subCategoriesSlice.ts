@@ -73,7 +73,7 @@ export const subCategoriesSlice = createSlice({
     builder.addCase(createSubCategory.fulfilled, (state, action) => {
       state.isLoading = false;
       const newSubCategory = action.payload as SubCategoryResponseDto;
-      const categoryId = newSubCategory.categoryId;
+      const categoryId = newSubCategory.category.id;
       if (!state.subCategoriesByCategory[categoryId]) {
         state.subCategoriesByCategory[categoryId] = [];
       }
@@ -95,15 +95,35 @@ export const subCategoriesSlice = createSlice({
     builder.addCase(editSubCategory.fulfilled, (state, action) => {
       state.isLoading = false;
       const updatedSubCategory = action.payload as SubCategoryResponseDto;
-      const categoryId = updatedSubCategory.categoryId;
-      if (state.subCategoriesByCategory[categoryId]) {
-        state.subCategoriesByCategory[categoryId] =
-          state.subCategoriesByCategory[categoryId].map((subCategory) =>
-            subCategory.id === updatedSubCategory.id
-              ? updatedSubCategory
-              : subCategory
-          );
+      const categoryId = updatedSubCategory.category.id;
+
+      // Initialize the array if it doesn't exist
+      if (!state.subCategoriesByCategory[categoryId]) {
+        state.subCategoriesByCategory[categoryId] = [];
       }
+
+      // Update the sub category in the category's array
+      console.log("updated sub category", updatedSubCategory);
+      console.log(
+        "state.subCategoriesByCategory[categoryId]",
+        state.subCategoriesByCategory[categoryId]
+      );
+      for (const subCategory of state.subCategoriesByCategory[categoryId]) {
+        console.log(subCategory.id);
+      }
+      state.subCategoriesByCategory[categoryId] = state.subCategoriesByCategory[
+        categoryId
+      ].map((subCategory) =>
+        subCategory.id === updatedSubCategory.id
+          ? updatedSubCategory
+          : subCategory
+      );
+
+      // Update selectedSubCategory if it's the one being edited
+      if (state.selectedSubCategory?.id === updatedSubCategory.id) {
+        state.selectedSubCategory = updatedSubCategory;
+      }
+
       state.error = null;
     });
     builder.addCase(editSubCategory.rejected, (state, action) => {

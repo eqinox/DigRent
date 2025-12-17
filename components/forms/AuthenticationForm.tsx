@@ -1,7 +1,14 @@
 "use client";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -11,7 +18,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { RootState } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { login, register } from "@/store/thunks/fetchAuthentication";
 import {
   loginSchema,
   signupSchema,
@@ -19,19 +28,18 @@ import {
   type SignupFormData,
 } from "@/validation/authentication";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { login, register } from "@/store/thunks/fetchAuthentication";
-import type { RootState } from "@/store";
 
 export default function AuthenticationForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const authError = useAppSelector((state: RootState) => state.auth.error);
-  const authIsLoading = useAppSelector((state: RootState) => state.auth.isLoading);
+  const authIsLoading = useAppSelector(
+    (state: RootState) => state.auth.isLoading
+  );
   const [isLogin, setIsLogin] = useState(searchParams.get("mode") !== "signup");
 
   const form = useForm<LoginFormData | SignupFormData>({
@@ -41,7 +49,7 @@ export default function AuthenticationForm() {
       password: "",
       username: "",
       confirmPassword: "",
-    }
+    },
   });
 
   // Update form when mode changes from URL
@@ -59,28 +67,27 @@ export default function AuthenticationForm() {
   }, [searchParams, isLogin, form]);
 
   const onSubmit = async (data: LoginFormData | SignupFormData) => {
-      // Validate with correct schema
-      const schema = isLogin ? loginSchema : signupSchema;
-      const validationResult = schema.safeParse(data);
-      
-      if (!validationResult.success) {
-        // Set form errors
-        const errors = validationResult.error.flatten().fieldErrors;
-        Object.keys(errors).forEach((key) => {
-          form.setError(key as any, {
-            type: "validation",
-            message: errors[key as keyof typeof errors]?.[0],
-          });
-        });
-        return;
-      }
+    // Validate with correct schema
+    const schema = isLogin ? loginSchema : signupSchema;
+    const validationResult = schema.safeParse(data);
 
-      if (isLogin) {
-        const result = await dispatch(login(data as LoginFormData));
-        // console.log('result', result);
-      } else {
-        const result = await dispatch(register(data as SignupFormData));
-      }
+    if (!validationResult.success) {
+      // Set form errors
+      const errors = validationResult.error.flatten().fieldErrors;
+      Object.keys(errors).forEach((key) => {
+        form.setError(key as any, {
+          type: "validation",
+          message: errors[key as keyof typeof errors]?.[0],
+        });
+      });
+      return;
+    }
+
+    if (isLogin) {
+      await dispatch(login(data as LoginFormData));
+    } else {
+      await dispatch(register(data as SignupFormData));
+    }
   };
 
   const toggleForm = () => {
@@ -94,40 +101,62 @@ export default function AuthenticationForm() {
   };
 
   return (
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="mb-6 text-center">
-          <CardTitle className="mb-2 text-2xl font-bold">
-            {isLogin ? "Добре дошли отново" : "Създаване на акаунт"}
-          </CardTitle>
-          <CardDescription>
-            {isLogin
-              ? "Влезте в акаунта си, за да продължите"
-              : "Попълнете данните по-долу, за да създадете акаунт"}
-          </CardDescription>
-        </CardHeader>
+    <Card className="w-full max-w-md shadow-lg">
+      <CardHeader className="mb-6 text-center">
+        <CardTitle className="mb-2 text-2xl font-bold">
+          {isLogin ? "Добре дошли отново" : "Създаване на акаунт"}
+        </CardTitle>
+        <CardDescription>
+          {isLogin
+            ? "Влезте в акаунта си, за да продължите"
+            : "Попълнете данните по-долу, за да създадете акаунт"}
+        </CardDescription>
+      </CardHeader>
 
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {/* Global error message */}
-              {authError && (
-                <Alert variant="destructive">
-                  <AlertDescription>{authError}</AlertDescription>
-                </Alert>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Global error message */}
+            {authError && (
+              <Alert variant="destructive">
+                <AlertDescription>{authError}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Email Field */}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Имейл</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="Въведете вашия имейл"
+                      {...field}
+                      autoCapitalize="none"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
+            />
 
-              {/* Email Field */}
+            {/* Username Field */}
+            {!isLogin && (
               <FormField
                 control={form.control}
-                name="email"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Имейл</FormLabel>
+                    <FormLabel>Потребителско име (Незадължително)</FormLabel>
                     <FormControl>
                       <Input
-                        type="email"
-                        placeholder="Въведете вашия имейл"
+                        type="text"
+                        placeholder="Въведете потребителско име"
                         {...field}
+                        value={field.value || ""}
                         autoCapitalize="none"
                       />
                     </FormControl>
@@ -135,41 +164,39 @@ export default function AuthenticationForm() {
                   </FormItem>
                 )}
               />
+            )}
 
-              {/* Username Field */}
-              {!isLogin && (
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Потребителско име (Незадължително)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Въведете потребителско име"
-                          {...field}
-                          value={field.value || ""}
-                          autoCapitalize="none"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            {/* Password Field */}
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Парола</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Въведете вашата парола"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
+            />
 
-              {/* Password Field */}
+            {/* Confirm Password Field */}
+            {!isLogin && (
               <FormField
                 control={form.control}
-                name="password"
+                name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Парола</FormLabel>
+                    <FormLabel>Потвърди парола</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Въведете вашата парола"
+                        placeholder="Потвърдете вашата парола"
                         {...field}
                       />
                     </FormControl>
@@ -177,61 +204,40 @@ export default function AuthenticationForm() {
                   </FormItem>
                 )}
               />
+            )}
 
-              {/* Confirm Password Field */}
-              {!isLogin && (
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Потвърди парола</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Потвърдете вашата парола"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                size="lg"
-                className="mt-4 w-full"
-                disabled={authIsLoading}
-              >
-                {authIsLoading
-                  ? "Обработване..."
-                  : isLogin
-                    ? "Влизане"
-                    : "Регистрация"}
-              </Button>
-            </form>
-          </Form>
-
-          {/* Toggle Form Type */}
-          <div className="mt-6 flex items-center justify-center gap-2">
-            <p className="text-sm text-muted-foreground">
-              {isLogin ? "Нямате акаунт? " : "Вече имате акаунт? "}
-            </p>
+            {/* Submit Button */}
             <Button
-              type="button"
-              variant="link"
-              size="sm"
-              className="h-auto p-0"
-              onClick={toggleForm}
+              type="submit"
+              size="lg"
+              className="mt-4 w-full"
+              disabled={authIsLoading}
             >
-              {isLogin ? "Регистрация" : "Влизане"}
+              {authIsLoading
+                ? "Обработване..."
+                : isLogin
+                ? "Влизане"
+                : "Регистрация"}
             </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </form>
+        </Form>
+
+        {/* Toggle Form Type */}
+        <div className="mt-6 flex items-center justify-center gap-2">
+          <p className="text-sm text-muted-foreground">
+            {isLogin ? "Нямате акаунт? " : "Вече имате акаунт? "}
+          </p>
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            className="h-auto p-0"
+            onClick={toggleForm}
+          >
+            {isLogin ? "Регистрация" : "Влизане"}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
-

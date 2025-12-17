@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -62,10 +62,7 @@ export default function CategoryForm({
   const isLoading = useAppSelector(
     (state: RootState) => state.categories.isLoading
   );
-  const schema = useMemo(
-    () => (isEditMode ? categoryUpdateSchema : categoryCreateSchema),
-    [isEditMode]
-  );
+  const schema = isEditMode ? categoryUpdateSchema : categoryCreateSchema;
 
   const form = useForm<CategoryCreateData | CategoryUpdateData>({
     resolver: zodResolver(schema),
@@ -79,6 +76,9 @@ export default function CategoryForm({
   });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const isSubmittingRef = useRef(false);
+  const previousCategoryIdRef = useRef<string | null>(null);
+  const hasLoadedInitialDataRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -87,6 +87,33 @@ export default function CategoryForm({
   }, [dispatch]);
 
   useEffect(() => {
+    // Skip reset if form is currently loading/submitting
+    if (isLoading) {
+      return;
+    }
+
+    // In edit mode: skip reset if we just submitted (prevents reset when Redux updates after successful edit)
+    if (isEditMode && isSubmittingRef.current) {
+      return;
+    }
+
+    const currentCategoryId = categoryId || (initialData as any)?.id || null;
+
+    // In edit mode: check if we've already loaded initial data for this category
+    if (isEditMode && previousCategoryIdRef.current !== null) {
+      if (previousCategoryIdRef.current === currentCategoryId) {
+        // Same category - only skip if we've already loaded initial data
+        // This allows initial load but prevents reset after successful edit
+        if (hasLoadedInitialDataRef.current) {
+          return;
+        }
+      } else {
+        // Different category - reset flags and allow reset
+        isSubmittingRef.current = false;
+        hasLoadedInitialDataRef.current = false;
+      }
+    }
+
     if (initialData) {
       form.reset({
         name: initialData.name ?? "",
@@ -104,8 +131,14 @@ export default function CategoryForm({
       ) {
         setPreviewUrl(`${BASE_URL}/${(initialData.image as any).original}`);
       }
+
+      // Mark that we've loaded initial data for this category
+      if (isEditMode && currentCategoryId) {
+        previousCategoryIdRef.current = currentCategoryId;
+        hasLoadedInitialDataRef.current = true;
+      }
     }
-  }, [initialData, form, isEditMode, categoryId]);
+  }, [initialData, form, isEditMode, categoryId, isLoading]);
 
   const imageValue = form.watch("image");
 
@@ -127,6 +160,9 @@ export default function CategoryForm({
 
   const onSubmit = async (values: CategoryCreateData | CategoryUpdateData) => {
     try {
+      // Mark that we're submitting to prevent form reset
+      isSubmittingRef.current = true;
+
       if (isEditMode) {
         // In edit mode, only include image if a new file was selected
         const hasNewImage = values.image instanceof File;
@@ -160,6 +196,7 @@ export default function CategoryForm({
             },
             onError: (message: string) => {
               toast.error(message);
+              isSubmittingRef.current = false;
             },
           })
         );
@@ -174,6 +211,7 @@ export default function CategoryForm({
 
         if (!base64Image) {
           toast.error("Снимката е задължителна");
+          isSubmittingRef.current = false;
           return;
         }
 
@@ -191,6 +229,7 @@ export default function CategoryForm({
             },
             onError: (message: string) => {
               toast.error(message);
+              isSubmittingRef.current = false;
             },
           })
         );
@@ -198,6 +237,8 @@ export default function CategoryForm({
     } catch (error) {
       toast.error("Възникна грешка при обработка на изображението");
       console.error(error);
+      // Reset submitting flag on error
+      isSubmittingRef.current = false;
     }
   };
 

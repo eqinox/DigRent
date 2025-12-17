@@ -1,12 +1,12 @@
+import { ImageDto } from "./common.dto";
+
 export interface CategoryResponseDto {
   id: string;
   name: string;
-  equipment: string[];
-  created_by: string;
-  image: {
-    small: string;
-    original: string;
-  };
+  image: ImageDto;
+  creatorId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CategoryDeleteResponseDto {

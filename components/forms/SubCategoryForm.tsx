@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -21,6 +21,7 @@ import { BASE_URL } from "@/constants";
 import { FormMode } from "@/dto/common.dto";
 import { RootState } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { resetSelectedSubCategory } from "@/store/slices/subCategoriesSlice";
 import {
   createSubCategory,
   editSubCategory,
@@ -37,7 +38,11 @@ type SubCategoryFormProps = {
   categoryId?: string;
   subCategoryId?: string;
   initialData?: Partial<SubCategoryUpdateData>;
-  onSuccessRedirect?: (params: { type: string; mode: FormMode }) => void;
+  onSuccessRedirect?: (params: {
+    type: string;
+    mode: FormMode;
+    categoryId: string;
+  }) => void;
 };
 
 const fileToBase64 = (file: File): Promise<string> => {
@@ -66,10 +71,10 @@ export default function SubCategoryForm({
   const isLoading = useAppSelector(
     (state: RootState) => state.subCategories.isLoading
   );
-  const schema = useMemo(
-    () => (isEditMode ? subCategoryUpdateSchema : subCategoryCreateSchema),
-    [isEditMode]
+  const selectedSubCategory = useAppSelector(
+    (state: RootState) => state.subCategories.selectedSubCategory
   );
+  const schema = isEditMode ? subCategoryUpdateSchema : subCategoryCreateSchema;
 
   const form = useForm<SubCategoryCreateData | SubCategoryUpdateData>({
     resolver: zodResolver(schema),
@@ -85,8 +90,45 @@ export default function SubCategoryForm({
   });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const isSubmittingRef = useRef(false);
+  const previousSubCategoryIdRef = useRef<string | null>(null);
+  const hasLoadedInitialDataRef = useRef(false);
 
   useEffect(() => {
+    return () => {
+      dispatch(resetSelectedSubCategory());
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Skip reset if form is currently loading/submitting
+    if (isLoading) {
+      return;
+    }
+
+    // In edit mode: skip reset if we just submitted (prevents reset when Redux updates after successful edit)
+    if (isEditMode && isSubmittingRef.current) {
+      return;
+    }
+
+    const currentSubCategoryId =
+      subCategoryId || (initialData as any)?.id || null;
+
+    // In edit mode: check if we've already loaded initial data for this subcategory
+    if (isEditMode && previousSubCategoryIdRef.current !== null) {
+      if (previousSubCategoryIdRef.current === currentSubCategoryId) {
+        // Same subcategory - only skip if we've already loaded initial data
+        // This allows initial load but prevents reset after successful edit
+        if (hasLoadedInitialDataRef.current) {
+          return;
+        }
+      } else {
+        // Different subcategory - reset flags and allow reset
+        isSubmittingRef.current = false;
+        hasLoadedInitialDataRef.current = false;
+      }
+    }
+
     if (initialData) {
       form.reset({
         type: initialData.type ?? "",
@@ -106,6 +148,12 @@ export default function SubCategoryForm({
       ) {
         setPreviewUrl(`${BASE_URL}/${(initialData.image as any).original}`);
       }
+
+      // Mark that we've loaded initial data for this subcategory
+      if (isEditMode && currentSubCategoryId) {
+        previousSubCategoryIdRef.current = currentSubCategoryId;
+        hasLoadedInitialDataRef.current = true;
+      }
     } else if (!isEditMode && categoryId) {
       form.reset({
         type: "",
@@ -115,7 +163,7 @@ export default function SubCategoryForm({
         categoryId: categoryId,
       } as any);
     }
-  }, [initialData, form, isEditMode, categoryId, subCategoryId]);
+  }, [initialData, form, isEditMode, categoryId, subCategoryId, isLoading]);
 
   const imageValue = form.watch("image");
 
@@ -139,6 +187,9 @@ export default function SubCategoryForm({
     values: SubCategoryCreateData | SubCategoryUpdateData
   ) => {
     try {
+      // Mark that we're submitting to prevent form reset
+      isSubmittingRef.current = true;
+
       if (isEditMode) {
         // In edit mode, only include image if a new file was selected
         const hasNewImage = values.image instanceof File;
@@ -170,10 +221,17 @@ export default function SubCategoryForm({
             data: payload as SubCategoryUpdateData,
             onSuccess: (message: string) => {
               toast.success(message);
-              onSuccessRedirect?.({ type: payload.type, mode: "edit" });
+              const categoryIdForRedirect =
+                selectedSubCategory?.category?.id || "";
+              onSuccessRedirect?.({
+                type: payload.type,
+                mode: "edit",
+                categoryId: categoryIdForRedirect,
+              });
             },
             onError: (message: string) => {
               toast.error(message);
+              isSubmittingRef.current = false;
             },
           })
         );
@@ -188,6 +246,7 @@ export default function SubCategoryForm({
 
         if (!base64Image) {
           toast.error("Снимката е задължителна");
+          isSubmittingRef.current = false;
           return;
         }
 
@@ -205,10 +264,17 @@ export default function SubCategoryForm({
             data: payload as SubCategoryCreateData,
             onSuccess: (message: string) => {
               toast.success(message);
-              onSuccessRedirect?.({ type: payload.type, mode: "create" });
+              const categoryIdForRedirect =
+                categoryId || payload.categoryId || "";
+              onSuccessRedirect?.({
+                type: payload.type,
+                mode: "create",
+                categoryId: categoryIdForRedirect,
+              });
             },
             onError: (message: string) => {
               toast.error(message);
+              isSubmittingRef.current = false;
             },
           })
         );
@@ -216,6 +282,8 @@ export default function SubCategoryForm({
     } catch (error) {
       toast.error("Възникна грешка при обработка на изображението");
       console.error(error);
+      // Reset submitting flag on error
+      isSubmittingRef.current = false;
     }
   };
 

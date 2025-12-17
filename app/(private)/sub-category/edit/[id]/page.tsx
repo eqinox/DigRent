@@ -29,11 +29,11 @@ export default function EditSubCategoryPage({
     }
   }, [dispatch, id]);
 
-  const handleSuccess = (params: { type: string; mode: FormMode }) => {
+  const handleSuccess = (params: { type: string; mode: FormMode; categoryId: string }) => {
     router.push(
-      `/sub-category/success?mode=${params.mode}&name=${encodeURIComponent(
+      `/sub-category/success?mode=${params.mode}&type=${encodeURIComponent(
         params.type
-      )}`
+      )}&categoryId=${encodeURIComponent(params.categoryId)}`
     );
   };
 
