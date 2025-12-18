@@ -102,7 +102,7 @@ export default function CategoriesList() {
 
         {isLoading && categories.length === 0 ? (
           <div className="flex w-full gap-6">
-            <ItemGroup className="flex flex-row flex-wrap justify-center gap-4">
+            <ItemGroup className="flex flex-row flex-wrap justify-center mx-auto gap-4">
               {Array.from({ length: 5 }).map((_, index) => (
                 <Item key={index} variant="outline" className="w-48">
                   <ItemContent>
@@ -127,14 +127,14 @@ export default function CategoriesList() {
           </div>
         ) : (
           <div className="flex w-full gap-6">
-            <ItemGroup className="flex flex-row flex-wrap justify-center gap-4">
+            <ItemGroup className="flex flex-row flex-wrap justify-center mx-auto gap-4">
               {categories.map((category: CategoryResponseDto) => {
                 const isDeleting = deletingCategoryId === category.id;
                 return (
                   <Item
                     key={category.id}
                     variant="outline"
-                    className={`w-48 relative ${
+                    className={`w-48 flex flex-col relative ${
                       isDeleting ? "opacity-50 pointer-events-none" : ""
                     }`}
                   >

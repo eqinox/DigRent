@@ -39,7 +39,7 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <div className="relative flex min-h-screen flex-col max-w-7xl mx-auto ">
+              <div className="relative flex min-h-screen flex-col max-w-7xl mx-auto border-2 border-stone-800">
                 {/* <div className="absolute right-4 top-4 z-50"> */}
                 {/* <ThemeToggle /> */}
                 {/* </div> */}

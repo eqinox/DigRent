@@ -109,7 +109,7 @@ export default function SubCategoriesList({
   const isAdmin = user?.role === "admin";
 
   return (
-    <div className="container mx-auto p-4 pb-20">
+    <div className="p-4 pb-20 w-full text-center items-center flex flex-col">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-center">Подкатегории</h1>
       </div>
@@ -123,15 +123,15 @@ export default function SubCategoriesList({
           <p className="text-sm text-center">Няма налични подкатегории</p>
         </div>
       ) : (
-        <div className="flex w-full max-w-xl flex-col gap-6">
-          <ItemGroup className="grid grid-cols-3 gap-4">
+        <div className="flex w-full flex-col gap-6">
+          <ItemGroup className="flex flex-row flex-wrap justify-center mx-auto gap-4">
             {subCategories.map((subCategory: SubCategoryResponseDto) => {
               const isDeleting = deletingSubCategoryId === subCategory.id;
               return (
                 <Item
                   key={subCategory.id}
                   variant="outline"
-                  className={`cursor-pointer relative ${
+                  className={`w-48 flex flex-col cursor-pointer relative ${
                     isDeleting ? "opacity-50 pointer-events-none" : ""
                   }`}
                 >

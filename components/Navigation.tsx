@@ -63,7 +63,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="absolute bottom-0 w-full">
+    <nav className="fixed bottom-0 max-w-7xl w-full z-50">
       <Menubar className="justify-center h-16">
         <MenubarMenu>
           <MenubarTrigger onClick={() => router.push("/")}>
