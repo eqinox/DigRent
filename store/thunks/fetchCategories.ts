@@ -1,7 +1,4 @@
-import {
-  CategoryDeleteResponseDto,
-  CategoryResponseDto,
-} from "@/dto/category.dto";
+import { CategoryDeleteResponseDto, CategoryResponseDto } from "@/dto/category.dto";
 import { handleFetchBaseQueryError } from "@/lib/helpers";
 import { CategoryCreateData, CategoryUpdateData } from "@/validation/category";
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -9,21 +6,18 @@ import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { apiSlice } from "../slices/apiSlice";
 import CallbackHandlers from "./callback-type";
 
-const fetchCategories = createAsyncThunk(
-  "categories/fetch",
-  async (_, { dispatch }) => {
-    const result = (await dispatch(
-      apiSlice.endpoints.authenticatedGet.initiate("/categories")
-    )) as { data: CategoryResponseDto[] } | { error: FetchBaseQueryError };
+const fetchCategories = createAsyncThunk("categories/fetch", async (_, { dispatch }) => {
+  const result = (await dispatch(apiSlice.endpoints.authenticatedGet.initiate("/categories"))) as
+    | { data: CategoryResponseDto[] }
+    | { error: FetchBaseQueryError };
 
-    if ("data" in result) {
-      return result.data;
-    } else if ("error" in result) {
-      const errorMessage = handleFetchBaseQueryError(result.error);
-      throw new Error(errorMessage);
-    }
+  if ("data" in result) {
+    return result.data;
+  } else if ("error" in result) {
+    const errorMessage = handleFetchBaseQueryError(result.error);
+    throw new Error(errorMessage);
   }
-);
+});
 
 const createCategory = createAsyncThunk(
   "categories/create",
@@ -102,9 +96,7 @@ const deleteCategory = createAsyncThunk(
     { dispatch }
   ) => {
     const result = (await dispatch(
-      apiSlice.endpoints.authenticatedDelete.initiate(
-        `/categories/${categoryId}`
-      )
+      apiSlice.endpoints.authenticatedDelete.initiate(`/categories/${categoryId}`)
     )) as { data: CategoryDeleteResponseDto } | { error: FetchBaseQueryError };
 
     if ("data" in result) {
@@ -134,10 +126,4 @@ const findCategoryById = createAsyncThunk(
   }
 );
 
-export {
-  createCategory,
-  deleteCategory,
-  editCategory,
-  fetchCategories,
-  findCategoryById,
-};
+export { createCategory, deleteCategory, editCategory, fetchCategories, findCategoryById };

@@ -2,13 +2,7 @@
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -30,13 +24,12 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function AuthenticationForm() {
   const dispatch = useAppDispatch();
   const authError = useAppSelector((state: RootState) => state.auth.error);
-  const authIsLoading = useAppSelector(
-    (state: RootState) => state.auth.isLoading
-  );
+  const authIsLoading = useAppSelector((state: RootState) => state.auth.isLoading);
   const [isLogin, setIsLogin] = useState(true);
 
   const form = useForm<LoginFormData | SignupFormData>({
@@ -48,6 +41,11 @@ export default function AuthenticationForm() {
       confirmPassword: "",
     },
   });
+
+  const successAfterRegister = () => {
+    toast.success("Регистрацията е успешна");
+    setIsLogin(true);
+  };
 
   const onSubmit = async (data: LoginFormData | SignupFormData) => {
     // Validate with correct schema
@@ -69,7 +67,9 @@ export default function AuthenticationForm() {
     if (isLogin) {
       await dispatch(login(data as LoginFormData));
     } else {
-      await dispatch(register(data as SignupFormData));
+      await dispatch(
+        register({ signupData: data as SignupFormData, onSuccess: successAfterRegister })
+      );
     }
   };
 
@@ -157,11 +157,7 @@ export default function AuthenticationForm() {
                 <FormItem>
                   <FormLabel>Парола</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Въведете вашата парола"
-                      {...field}
-                    />
+                    <Input type="password" placeholder="Въведете вашата парола" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -177,11 +173,7 @@ export default function AuthenticationForm() {
                   <FormItem>
                     <FormLabel>Потвърди парола</FormLabel>
                     <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Потвърдете вашата парола"
-                        {...field}
-                      />
+                      <Input type="password" placeholder="Потвърдете вашата парола" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -190,17 +182,8 @@ export default function AuthenticationForm() {
             )}
 
             {/* Submit Button */}
-            <Button
-              type="submit"
-              size="lg"
-              className="mt-4 w-full"
-              disabled={authIsLoading}
-            >
-              {authIsLoading
-                ? "Обработване..."
-                : isLogin
-                ? "Влизане"
-                : "Регистрация"}
+            <Button type="submit" size="lg" className="mt-4 w-full" disabled={authIsLoading}>
+              {authIsLoading ? "Обработване..." : isLogin ? "Влизане" : "Регистрация"}
             </Button>
           </form>
         </Form>
