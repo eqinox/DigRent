@@ -17,6 +17,16 @@ export default function PrivateLayout({ children }: { children: React.ReactNode 
     }
   }, [isAuthenticated, isLoading, router]);
 
+  // Show loading state while checking authentication
+  // This check is essential for the authentication initialization process
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div>Зареждане...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center">
       {children}
