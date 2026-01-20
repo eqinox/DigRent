@@ -28,19 +28,16 @@ import {
   type SignupFormData,
 } from "@/validation/authentication";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function AuthenticationForm() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
   const dispatch = useAppDispatch();
   const authError = useAppSelector((state: RootState) => state.auth.error);
   const authIsLoading = useAppSelector(
     (state: RootState) => state.auth.isLoading
   );
-  const [isLogin, setIsLogin] = useState(searchParams.get("mode") !== "signup");
+  const [isLogin, setIsLogin] = useState(true);
 
   const form = useForm<LoginFormData | SignupFormData>({
     resolver: zodResolver(isLogin ? loginSchema : signupSchema),
@@ -51,20 +48,6 @@ export default function AuthenticationForm() {
       confirmPassword: "",
     },
   });
-
-  // Update form when mode changes from URL
-  useEffect(() => {
-    const newMode = searchParams.get("mode") === "signup" ? false : true;
-    if (newMode !== isLogin) {
-      setIsLogin(newMode);
-      form.reset({
-        email: "",
-        password: "",
-        username: "",
-        confirmPassword: "",
-      });
-    }
-  }, [searchParams, isLogin, form]);
 
   const onSubmit = async (data: LoginFormData | SignupFormData) => {
     // Validate with correct schema

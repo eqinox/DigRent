@@ -1,23 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Suspense } from "react";
 import AuthenticationForm from "@/components/forms/AuthenticationForm";
-import { useAppSelector } from "@/store/hooks";
 import type { RootState } from "@/store";
+import { useAppSelector } from "@/store/hooks";
+import { useRouter } from "next/navigation";
+import { Suspense, useEffect } from "react";
 
 export default function AuthPage() {
   const router = useRouter();
   const isAuthenticated = useAppSelector((state: RootState) => state.auth.isAuthenticated);
-  const isLoading = useAppSelector((state: RootState) => state.auth.isLoading);
 
   // Redirect to categories when authenticated
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (isAuthenticated) {
       router.push("/categories");
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated]);
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">

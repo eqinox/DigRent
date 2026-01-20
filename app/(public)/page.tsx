@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAppSelector } from "@/store/hooks";
 import type { RootState } from "@/store";
+import { useAppSelector } from "@/store/hooks";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
@@ -19,15 +19,6 @@ export default function Home() {
       }
     }
   }, [isAuthenticated, isLoading, router]);
-
-  // Show loading state while checking authentication
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div>Зареждане...</div>
-      </div>
-    );
-  }
 
   return null;
 }
