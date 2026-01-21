@@ -115,6 +115,7 @@ export default function AuthenticationForm() {
                   <FormLabel>Имейл</FormLabel>
                   <FormControl>
                     <Input
+                      id="email"
                       type="email"
                       placeholder="Въведете вашия имейл"
                       {...field}
@@ -136,6 +137,7 @@ export default function AuthenticationForm() {
                     <FormLabel>Потребителско име (Незадължително)</FormLabel>
                     <FormControl>
                       <Input
+                        id="username"
                         type="text"
                         placeholder="Въведете потребителско име"
                         {...field}
@@ -157,7 +159,12 @@ export default function AuthenticationForm() {
                 <FormItem>
                   <FormLabel>Парола</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Въведете вашата парола" {...field} />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Въведете вашата парола"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -173,7 +180,12 @@ export default function AuthenticationForm() {
                   <FormItem>
                     <FormLabel>Потвърди парола</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="Потвърдете вашата парола" {...field} />
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="Потвърдете вашата парола"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -182,7 +194,13 @@ export default function AuthenticationForm() {
             )}
 
             {/* Submit Button */}
-            <Button type="submit" size="lg" className="mt-4 w-full" disabled={authIsLoading}>
+            <Button
+              id="submit"
+              type="submit"
+              size="lg"
+              className="mt-4 w-full"
+              disabled={authIsLoading}
+            >
               {authIsLoading ? "Обработване..." : isLogin ? "Влизане" : "Регистрация"}
             </Button>
           </form>
