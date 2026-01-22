@@ -59,9 +59,7 @@ export default function CategoryForm({
   const isEditMode = mode === "edit";
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const isLoading = useAppSelector(
-    (state: RootState) => state.categories.isLoading
-  );
+  const isLoading = useAppSelector((state: RootState) => state.categories.isLoading);
   const schema = isEditMode ? categoryUpdateSchema : categoryCreateSchema;
 
   const form = useForm<CategoryCreateData | CategoryUpdateData>({
@@ -69,9 +67,7 @@ export default function CategoryForm({
     defaultValues: {
       name: initialData?.name ?? "",
       image: initialData?.image ?? null,
-      ...(isEditMode
-        ? { id: categoryId || (initialData as any)?.id || "" }
-        : {}),
+      ...(isEditMode ? { id: categoryId || (initialData as any)?.id || "" } : {}),
     } as any,
   });
 
@@ -118,17 +114,12 @@ export default function CategoryForm({
       form.reset({
         name: initialData.name ?? "",
         image: initialData.image ?? null,
-        ...(isEditMode
-          ? { id: categoryId || (initialData as any)?.id || "" }
-          : {}),
+        ...(isEditMode ? { id: categoryId || (initialData as any)?.id || "" } : {}),
       } as any);
 
       if (initialData.image && typeof initialData.image === "string") {
         setPreviewUrl(`${BASE_URL}/${initialData.image}`);
-      } else if (
-        typeof initialData.image === "object" &&
-        (initialData.image as any)?.original
-      ) {
+      } else if (typeof initialData.image === "object" && (initialData.image as any)?.original) {
         setPreviewUrl(`${BASE_URL}/${(initialData.image as any).original}`);
       }
 
@@ -148,9 +139,7 @@ export default function CategoryForm({
       setPreviewUrl(objectUrl);
       return () => URL.revokeObjectURL(objectUrl);
     } else if (typeof imageValue === "string") {
-      setPreviewUrl(
-        imageValue.startsWith("http") ? imageValue : `${BASE_URL}/${imageValue}`
-      );
+      setPreviewUrl(imageValue.startsWith("http") ? imageValue : `${BASE_URL}/${imageValue}`);
     }
   }, [imageValue]);
 
@@ -174,11 +163,7 @@ export default function CategoryForm({
 
         // Build payload - only include image if a new file was selected
         const payload: any = {
-          id:
-            (values as CategoryUpdateData).id ||
-            categoryId ||
-            (initialData as any)?.id ||
-            "",
+          id: (values as CategoryUpdateData).id || categoryId || (initialData as any)?.id || "",
           name: values.name,
         };
 
@@ -282,9 +267,7 @@ export default function CategoryForm({
                     <Input
                       type="file"
                       accept="image/*"
-                      onChange={(event) =>
-                        handleImageChange(event.target.files?.[0] ?? null)
-                      }
+                      onChange={(event) => handleImageChange(event.target.files?.[0] ?? null)}
                     />
                     {previewUrl ? (
                       <div className="relative h-32 w-32 overflow-hidden rounded-md border">
@@ -309,12 +292,8 @@ export default function CategoryForm({
           />
 
           <div className="flex gap-2">
-            <Button type="submit" disabled={isLoading}>
-              {isLoading
-                ? "Обработване..."
-                : isEditMode
-                ? "Запази промените"
-                : "Създай категория"}
+            <Button id="submit" type="submit" disabled={isLoading}>
+              {isLoading ? "Обработване..." : isEditMode ? "Запази промените" : "Създай категория"}
             </Button>
             <Button
               type="button"

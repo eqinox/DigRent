@@ -34,12 +34,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function CategoriesList() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const categories = useAppSelector(
-    (state: RootState) => state.categories.categories
-  );
-  const isLoading = useAppSelector(
-    (state: RootState) => state.categories.isLoading
-  );
+  const categories = useAppSelector((state: RootState) => state.categories.categories);
+  const isLoading = useAppSelector((state: RootState) => state.categories.isLoading);
   const deletingCategoryId = useAppSelector(
     (state: RootState) => state.categories.deletingCategoryId
   );
@@ -148,9 +144,7 @@ export default function CategoriesList() {
                     </ItemContent>
                     <ItemDescription
                       className={isDeleting ? "" : "cursor-pointer"}
-                      onClick={() =>
-                        !isDeleting && handleCategoryPress(category.id)
-                      }
+                      onClick={() => !isDeleting && handleCategoryPress(category.id)}
                     >
                       <span className="relative h-32 w-full overflow-hidden block">
                         <Image
@@ -211,14 +205,12 @@ export default function CategoriesList() {
           <AlertDialogHeader>
             <AlertDialogTitle>Изтриване на категория</AlertDialogTitle>
             <AlertDialogDescription>
-              Сигурни ли сте, че искате да изтриете тази категория? Това
-              действие не може да бъде отменено.
+              Сигурни ли сте, че искате да изтриете тази категория? Това действие не може да бъде
+              отменено.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelDeleteCategory}>
-              Отказ
-            </AlertDialogCancel>
+            <AlertDialogCancel onClick={cancelDeleteCategory}>Отказ</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteCategory}
               className="bg-red-500 hover:bg-red-600"

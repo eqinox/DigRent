@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "jest"
+    "test": "jest",
+    "test categories": "jest tests/categories.test.tsx",
+    "test authentication": "jest tests/authentication.test.tsx"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
