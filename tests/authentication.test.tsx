@@ -1,8 +1,10 @@
 import AuthPage from "@/app/(public)/auth/page";
 import AuthenticationForm from "@/components/forms/AuthenticationForm";
+import Navigation from "@/components/Navigation";
 import { LoginResponseDto } from "@/dto/auth.dto";
 import { authReducer } from "@/store/slices/authSlice";
-import { login, register } from "@/store/thunks/fetchAuthentication";
+import { categoriesReducer } from "@/store/slices/categoriesSlice";
+import { login, logout, register } from "@/store/thunks/fetchAuthentication";
 import type { ThunkDispatch, UnknownAction } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -24,12 +26,15 @@ jest.mock("sonner", () => ({
 jest.mock("@/store/thunks/fetchAuthentication", () => {
   const actual = jest.requireActual("@/store/thunks/fetchAuthentication");
   const mockLogin = jest.fn();
+  const mockLogout = jest.fn();
   const mockRegister = jest.fn();
   Object.assign(mockLogin, actual.login);
+  Object.assign(mockLogout, actual.logout);
   Object.assign(mockRegister, actual.register);
   return {
     ...actual,
     login: mockLogin,
+    logout: mockLogout,
     register: mockRegister,
   };
 });
@@ -329,6 +334,67 @@ describe("Authentication", () => {
 
       expect(emailInput).toHaveValue(email);
       expect(passwordInput).toHaveValue(password);
+    });
+  });
+
+  describe("Logout", () => {
+    it("logs out from navigation and redirects to /auth", async () => {
+      const push = jest.fn();
+      (useRouter as jest.Mock).mockReturnValue({ push });
+
+      type LogoutArgs = Parameters<typeof logout>[0];
+      type LogoutThunk = ReturnType<typeof logout>;
+
+      const mockedLogout = jest.mocked(logout);
+      const createMockLogoutThunk = (arg: LogoutArgs): LogoutThunk => {
+        const thunk = (async (dispatch: ThunkDispatch<unknown, unknown, UnknownAction>) => {
+          arg.onSuccess?.("ok");
+          const fulfilledAction = logout.fulfilled(undefined, "test-request", arg);
+          dispatch(fulfilledAction);
+          return fulfilledAction;
+        }) as unknown as LogoutThunk;
+
+        return thunk;
+      };
+
+      mockedLogout.mockImplementation(createMockLogoutThunk);
+
+      const store = configureStore({
+        reducer: { auth: authReducer, categories: categoriesReducer },
+        preloadedState: {
+          auth: {
+            token: "test-token",
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+            user: { id: "user-1", email: "user@test.com", role: "user" },
+          },
+          categories: {
+            categories: [],
+            isLoading: false,
+            error: null,
+            selectedCategory: null,
+            message: "",
+            deletingCategoryId: null,
+            hasFetchedCategories: true,
+          },
+        },
+      });
+
+      render(
+        <Provider store={store}>
+          <Navigation />
+        </Provider>
+      );
+
+      const user = userEvent.setup();
+      await user.click(screen.getByText("CN"));
+      await user.click(screen.getByText("Изход"));
+
+      await waitFor(() => {
+        expect(push).toHaveBeenCalledWith("/auth");
+      });
+      expect(store.getState().auth.isAuthenticated).toBe(false);
     });
   });
 });

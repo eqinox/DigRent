@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "jest",
     "test categories": "jest tests/categories.test.tsx",
-    "test authentication": "jest tests/authentication.test.tsx"
+    "test authentication": "jest tests/authentication.test.tsx",
+    "test sub-categories": "jest tests/sub-categories.test.tsx"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
