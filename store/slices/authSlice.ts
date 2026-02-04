@@ -1,11 +1,6 @@
 import { UserDto } from "@/dto/auth.dto";
 import { createSlice } from "@reduxjs/toolkit";
-import {
-  initializeAuth,
-  login,
-  logout,
-  register,
-} from "../thunks/fetchAuthentication";
+import { initializeAuth, login, logout, register } from "../thunks/fetchAuthentication";
 
 export interface AuthState {
   token: string | null;

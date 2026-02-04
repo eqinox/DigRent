@@ -1,4 +1,5 @@
 import { BASE_URL } from "@/constants";
+import { LoginResponseDto } from "@/dto/auth.dto";
 import {
   BaseQueryFn,
   FetchArgs,
@@ -30,20 +31,21 @@ export const baseQueryWithReauth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
+
   if (result.error?.status === 401 || result.error?.status === 403) {
-    const refreshResult = await baseQuery(
+    const refreshResult = (await baseQuery(
       {
         url: "/auth/refresh",
         method: "GET",
       },
       api,
       extraOptions
-    );
+    )) as { data: LoginResponseDto } | { error: FetchBaseQueryError };
 
-    if (refreshResult.data) {
+    if ("data" in refreshResult) {
       api.dispatch({
         type: "auth/setCredentials",
-        payload: refreshResult.data,
+        payload: refreshResult.data.access_token,
       });
     } else {
       api.dispatch({ type: "auth/logoutAction" });
@@ -93,10 +95,8 @@ export const apiSlice = createApi({
     authenticatedGet: builder.mutation<any, string>({
       query: (url) => url,
       invalidatesTags: (result, error, url) => {
-        if (url.includes("/categories"))
-          return [{ type: "Category", id: "LIST" }];
-        if (url.includes("/equipment"))
-          return [{ type: "Equipment", id: "LIST" }];
+        if (url.includes("/categories")) return [{ type: "Category", id: "LIST" }];
+        if (url.includes("/equipment")) return [{ type: "Equipment", id: "LIST" }];
         return [];
       },
     }),
@@ -109,10 +109,8 @@ export const apiSlice = createApi({
         body: JSON.stringify(data),
       }),
       invalidatesTags: (result, error, { url }) => {
-        if (url.includes("/categories"))
-          return [{ type: "Category", id: "LIST" }];
-        if (url.includes("/equipment"))
-          return [{ type: "Equipment", id: "LIST" }];
+        if (url.includes("/categories")) return [{ type: "Category", id: "LIST" }];
+        if (url.includes("/equipment")) return [{ type: "Equipment", id: "LIST" }];
         return [];
       },
     }),
@@ -125,10 +123,8 @@ export const apiSlice = createApi({
         body: data,
       }),
       invalidatesTags: (result, error, { url }) => {
-        if (url.includes("/categories"))
-          return [{ type: "Category", id: "LIST" }];
-        if (url.includes("/equipment"))
-          return [{ type: "Equipment", id: "LIST" }];
+        if (url.includes("/categories")) return [{ type: "Category", id: "LIST" }];
+        if (url.includes("/equipment")) return [{ type: "Equipment", id: "LIST" }];
         return [];
       },
     }),
@@ -141,10 +137,8 @@ export const apiSlice = createApi({
         body: data,
       }),
       invalidatesTags: (result, error, { url }) => {
-        if (url.includes("/categories"))
-          return [{ type: "Category", id: "LIST" }];
-        if (url.includes("/equipment"))
-          return [{ type: "Equipment", id: "LIST" }];
+        if (url.includes("/categories")) return [{ type: "Category", id: "LIST" }];
+        if (url.includes("/equipment")) return [{ type: "Equipment", id: "LIST" }];
         return [];
       },
     }),
@@ -156,10 +150,8 @@ export const apiSlice = createApi({
         method: "DELETE",
       }),
       invalidatesTags: (result, error, url) => {
-        if (url.includes("/categories"))
-          return [{ type: "Category", id: "LIST" }];
-        if (url.includes("/equipment"))
-          return [{ type: "Equipment", id: "LIST" }];
+        if (url.includes("/categories")) return [{ type: "Category", id: "LIST" }];
+        if (url.includes("/equipment")) return [{ type: "Equipment", id: "LIST" }];
         return [];
       },
     }),

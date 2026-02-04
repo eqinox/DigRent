@@ -381,7 +381,7 @@ describe("Authentication", () => {
         },
       });
 
-      render(
+      const { unmount } = render(
         <Provider store={store}>
           <Navigation />
         </Provider>
@@ -395,6 +395,17 @@ describe("Authentication", () => {
         expect(push).toHaveBeenCalledWith("/auth");
       });
       expect(store.getState().auth.isAuthenticated).toBe(false);
+      expect(store.getState().auth.error).toBeNull();
+
+      unmount();
+
+      render(
+        <Provider store={store}>
+          <AuthPage />
+        </Provider>
+      );
+
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
   });
 });
