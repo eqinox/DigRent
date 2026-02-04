@@ -37,7 +37,7 @@ const register = createAsyncThunk(
         data: registerData,
       })
     )) as { data: RegisterResponseDto } | { error: FetchBaseQueryError };
-    console.log("result register", result);
+
     if ("data" in result) {
       if (onSuccess) {
         onSuccess("");

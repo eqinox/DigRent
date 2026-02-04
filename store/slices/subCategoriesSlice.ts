@@ -102,21 +102,9 @@ export const subCategoriesSlice = createSlice({
         state.subCategoriesByCategory[categoryId] = [];
       }
 
-      // Update the sub category in the category's array
-      console.log("updated sub category", updatedSubCategory);
-      console.log(
-        "state.subCategoriesByCategory[categoryId]",
-        state.subCategoriesByCategory[categoryId]
-      );
-      for (const subCategory of state.subCategoriesByCategory[categoryId]) {
-        console.log(subCategory.id);
-      }
-      state.subCategoriesByCategory[categoryId] = state.subCategoriesByCategory[
-        categoryId
-      ].map((subCategory) =>
-        subCategory.id === updatedSubCategory.id
-          ? updatedSubCategory
-          : subCategory
+      state.subCategoriesByCategory[categoryId] = state.subCategoriesByCategory[categoryId].map(
+        (subCategory) =>
+          subCategory.id === updatedSubCategory.id ? updatedSubCategory : subCategory
       );
 
       // Update selectedSubCategory if it's the one being edited
@@ -160,10 +148,9 @@ export const subCategoriesSlice = createSlice({
       const deletedSubCategoryId = action.payload as string;
       // Find and remove from the appropriate category
       for (const categoryId in state.subCategoriesByCategory) {
-        state.subCategoriesByCategory[categoryId] =
-          state.subCategoriesByCategory[categoryId].filter(
-            (subCategory) => subCategory.id !== deletedSubCategoryId
-          );
+        state.subCategoriesByCategory[categoryId] = state.subCategoriesByCategory[
+          categoryId
+        ].filter((subCategory) => subCategory.id !== deletedSubCategoryId);
       }
       state.error = null;
     });

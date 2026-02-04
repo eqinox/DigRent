@@ -21,11 +21,7 @@ import {
 } from "@/components/ui/card";
 import { BASE_URL } from "@/constants";
 import { EquipmentResponseDto } from "@/dto/equipment.dto";
-import {
-  RootState,
-  deleteEquipment,
-  fetchEquipmentsBySubCategoryId,
-} from "@/store";
+import { RootState, deleteEquipment, fetchEquipmentsBySubCategoryId } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Edit, Trash2 } from "lucide-react";
 import Image from "next/image";
@@ -40,17 +36,11 @@ interface EquipmentsListProps {
 export default function EquipmentsList({ subCategoryId }: EquipmentsListProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const equipments = useAppSelector(
-    (state: RootState) => state.equipments.equipments
-  );
-  const isLoading = useAppSelector(
-    (state: RootState) => state.equipments.isLoading
-  );
+  const equipments = useAppSelector((state: RootState) => state.equipments.equipments);
+  const isLoading = useAppSelector((state: RootState) => state.equipments.isLoading);
   const user = useAppSelector((state: RootState) => state.auth.user);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [equipmentToDelete, setEquipmentToDelete] = useState<string | null>(
-    null
-  );
+  const [equipmentToDelete, setEquipmentToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (subCategoryId) {
@@ -98,7 +88,7 @@ export default function EquipmentsList({ subCategoryId }: EquipmentsListProps) {
   };
 
   const isAdmin = user?.role === "admin";
-  console.log("isAdmin", isAdmin);
+
   return (
     <>
       <div className="container mx-auto p-4 pb-20">
@@ -138,14 +128,10 @@ export default function EquipmentsList({ subCategoryId }: EquipmentsListProps) {
                   )}
                   <div className="flex flex-1 flex-col p-4">
                     <CardHeader className="p-0 pb-2">
-                      <CardTitle className="text-lg font-bold">
-                        {equipment.name}
-                      </CardTitle>
+                      <CardTitle className="text-lg font-bold">{equipment.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0 pb-2">
-                      <p className="text-base">
-                        {equipment.pricePerDay} лв/ден
-                      </p>
+                      <p className="text-base">{equipment.pricePerDay} лв/ден</p>
                       <CardDescription className="pt-2 text-sm">
                         {equipment.description}
                       </CardDescription>
@@ -156,9 +142,7 @@ export default function EquipmentsList({ subCategoryId }: EquipmentsListProps) {
                           <Button
                             variant="warning"
                             size="sm"
-                            onClick={(e) =>
-                              handleEditEquipment(e, equipment.id)
-                            }
+                            onClick={(e) => handleEditEquipment(e, equipment.id)}
                             className="flex-1"
                           >
                             <Edit className="h-4 w-4" />
@@ -166,9 +150,7 @@ export default function EquipmentsList({ subCategoryId }: EquipmentsListProps) {
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={(e) =>
-                              handleRemoveEquipment(e, equipment.id)
-                            }
+                            onClick={(e) => handleRemoveEquipment(e, equipment.id)}
                             className="flex-1"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -190,14 +172,12 @@ export default function EquipmentsList({ subCategoryId }: EquipmentsListProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Изтриване на оборудване</AlertDialogTitle>
             <AlertDialogDescription>
-              Сигурни ли сте, че искате да изтриете това оборудване? Това
-              действие не може да бъде отменено.
+              Сигурни ли сте, че искате да изтриете това оборудване? Това действие не може да бъде
+              отменено.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelDeleteEquipment}>
-              Отказ
-            </AlertDialogCancel>
+            <AlertDialogCancel onClick={cancelDeleteEquipment}>Отказ</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteEquipment}
               className="bg-red-500 hover:bg-red-600"
